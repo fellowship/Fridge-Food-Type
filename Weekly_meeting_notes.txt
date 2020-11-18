@@ -1,0 +1,135 @@
+9/3
+Try coco/yolo on their own to see where we are
+Detectron on coco
+Yolo
+5000 images roughly
+Facebook detr
+Label
+Dataset summary (public)
+Datacrawler system--labelbox for annotating
+Retinanet working v1 implementation
+
+
+9/10
+100 instances per class test set
+-kept separate, for inference only
+Possible to-do: regression for occupied volume(or some similar metric) from images
+--10-30 buckets of measured relative fill %
+--use find limit of model
+2 more weeks
+--want an implemented model
+--results on test set
+Transfer learning--possible area of research
+-berkley paper maml
+-focus on domain adaptation
+To-do list:
+-final list of classes
+-How to treat instances within images that are not part of those classes
+-Fridge photos only?
+-Any shared annotation services?
+
+
+9/17
+Other category for everything under X number of labels
+--goal is 20 with many (250+) examples, label others as "unknown" or similar nameCurate dataset and apply out of the box pytorch solution. Can maybe try to add into FastAI port once we have specific problems
+--secondary to getting everything doneDoes somebody want to look at Arshak's fridge all the time?
+--give him a gmail for whoever wants to take screenshots of his fridge using samsung appStorage
+Google drive: platform AI bucket--controlled using SDK
+--Can keep on personal drive until handing the project off to Platform engs
+For github-we can just give instructions on cloning detr and list of changes we've made (instead of uploading full repo)Due items:
+today:
+ 2-3 slides for GE -- Confusion matrix, inference example, training/test image examples
+Tomorrow
+More detailed deck, wordpress post
+
+
+9/24
+In general we should keep working on building dataset out. 1 week more maybe to try and hit ideal number of images per class.I brought up that the dynamic LR that FB has built into the model probably won't work at all for us. At some point, we should edit that part of the repo so that we actually see LR changes without using their absurd 3-400 epoch training cycles
+Shared confusion matrix with Arshak--with the caveat that n/a's can be moved around by changing IOU and confidence thresholds on the calculation
+Oh, and I gave my email to Arshak, so i'll start taking 1-2 fridge screenshots a day
+
+
+Meeting Summary 10/1:
+Current results: 46 mAP on R50 backbone, 35 eps, LRdrop: 20 epochs
+Current work: Data refinement, Synthetic image creation (both GAN, CAD)
+Model aspects to check: IoU for duplicate boxes, relative cost weighting 
+Arshak suggestions: FB infoGAN, IBM painting with GANs - both suggestions for different GAN options in terms of creating synthetic images
+Is it worth training the transformer from scratch?
+--Watchman model that acts as a gateway to compare domains prior to model input
+--repo on the fellowship github
+--Uses main network activations to check quality of data
+--Worth looking into before trying to train transformer from scratch (3-400 epochs)
+Test Dataset
+--Will ask GE for at least 1 example image to see final domain
+--Arshak to mix up his fridge (i'll keep taking screenshots)
+When we need it, we can ask for an AWS instance for training. With some continued improvement, we'll likely present to GE data scientist. 
+
+10/15 meeting Arshak Notes
+Early on in blender pipeline, Arshak still agrees we will definitely need some form of synthetic images
+Can possibly get a fridge model from GE. Could use this as starting scene.
+NeRF as an option for possibly generating synthetic images
+-https://www.matthewtancik.com/nerf
+
+
+10/22 Arshak Meeting Notes
+Possible way to check domain issues: use embeddings on pretrained network to see level of differences between synthetic and true images
+Concerns about domain transfer of the false 3d generated images
+-will need some way to check performance of generated images vs true in-domain images
+Style transfer
+-train cycle GAN on true in-domain images
+-inference on Blender generated images
+-Pizza GAN team presentation tomorrow to try and steal a starting point
+NeRF: Possibly use to create object models
+-Need multiple images of same object. CMU has 12 images per object for 10 objects
+	-not enough
+
+
+10/29 Arshak meeting
+Fridge generation
+-Update since last week-Random placement complete, will render N number of images at ~1 min per image
+	-improvements: Can we place multiple images, adding more 3d item models (Lyupo to try generating), fix placement w/ rotation
+-Need to match in-domain images for synthetic data size (~800) for training
+	-both pixgan and cycle gan being investigated
+	-holdup on GAN training is full synthetic dataset generation
+Dishwasher
+-has been brought up due to new GE project
+	-is it loaded correctly: is rotating arm blocked, is it overfilled, are there any up-facing cavities
+	-are dishes clean post cycle running
+	-has anything fallen onto bottom (below bottom shelf)
+-no hardware reqs, lidar an option being considered
+-Would like to see 3d model of dishwasher to show we could possibly generate data for training
+Post meeting clarifications: 
+-No word back from GE fridge team on model. 
+-Should focus on wrapping up fridge prototype before moving on to dishwasher
+
+
+Arshak 11/5 meeting
+Can move meeting to 7:30 am HST (2 hours earlier than this meeting, 11:30am cst, 11pm IST)
+-will send out updated calendar invite before next week if nobody has any conflicts
+
+Blender status: 600 image set created, object distributions shuffled every 10 images. Avg about 70s per image on full run.
+-Work left: more models, annotation conversion
+
+Amit or Mohammad from Pizza/Implant groups for whenever we have GAN questions
+-already using some of there repos(Here's the one Amit shared: https://github.com/tmabraham/UPIT)
+-Should do the fastAI implementation: much faster training
+-Any update on pix2pix training?
+
+
+11/12 
+Shared initial GAN style transfer results. Definitely need further fine tuning
+-possible dataset cleaning of in-domain(keep full in-domain set as well). Concerned about further shrinking our domain dataset though
+Currently training Detr on combination of synthetic and natural images to see if we had a baseline performance shift
+-Will eventually need to check a few different conditions (full set, in-domain natural only, synthetic+style transfer, synthetic only)
+Keep an eye out for a way to measure quality of our transfers (some sort of comparison vs the in-domain images) in a quantitative way
+Arshak thinks this is a candidate for an actual paper we could publish
+
+Post Arshak Discussions:
+1 or 2k synthetic images - need to match them more similarly to our in domain
+-build out model library + add more repeats. Vastly different fill percentages between domain and synthetic currently, should be more matched
+Should start documenting GAN work on wordpress so we have a summary of what we've tried and what gives us relative improvements.
+Meeting next week (Tuesday?). Will add poll for time
+
+
+
+
